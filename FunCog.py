@@ -152,18 +152,13 @@ class FunBot(commands.Cog):
         await asyncio.sleep(1)
         await ctx.message.channel.purge(limit=1)
 
-        # user_names.append("user1")
-        # user_names.append("user2")
-        # user_names.append("user3")
-        # user_names.append("user4")
-        user_names.remove('InnerveMusic #0999')
+        user_names.remove('InnerveVibe #0999')
 
         if len(user_names) <= 2:
             embed = discord.Embed(description="Poll did not have any reaction.\nEnding poll")
             await ctx.send(embed=embed)
             return 
         random.shuffle(user_names)
-        await ctx.send(user_names)
         user_names = self.team_split(user_names, num)
         text = ''
         for i in range(len(user_names)):
@@ -198,4 +193,4 @@ class FunBot(commands.Cog):
         for reaction in reactions[:len(options)]:
             await react_message.add_reaction(reaction)
         await react_message.edit(embed=embed)
-            
+        
