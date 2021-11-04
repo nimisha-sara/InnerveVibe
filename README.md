@@ -39,7 +39,7 @@ Entertainment
    %poll ['question'] [poll options]
    └─ Sends a random movie name and details to the tagged user.
 ```
-`roll_die`, `coin_toss`, `wiki`, `m8ball`, `dumb_charades`, `text_ascii`, `team`, `poll`
+
 ```
 Utility
   %helpcmd
