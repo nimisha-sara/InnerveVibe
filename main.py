@@ -27,7 +27,7 @@ async def clear(ctx, amount=5):
     # Purges last 5 messages in the channel
     await ctx.channel.purge(limit=amount)
 
-
+# HELP COMMAND    
 @bot.group(invoke_without_command=True)
 async def helpcmd(ctx):
     em = discord.Embed(title="Help", description="Use %help <command> for more info on that command")
