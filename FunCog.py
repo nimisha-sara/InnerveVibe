@@ -171,6 +171,22 @@ class FunBot(commands.Cog):
 
     @commands.command(name='poll')
     async def pollGenerate(self, ctx, question, *options):
+        options = list(options)
+        if options[0].count("'") == 0:
+            await ctx.send("Pls give the question in quotes")
+            return
+
+        options[0] = options[0][1:]
+        question = ''
+        while True:
+            if "'" in options[0]:
+                question += " "+options[0][:-1]
+                options.pop(0)
+                break
+            else:
+                question += " "+options[0]
+                options.pop(0)
+        question = question.capitalize()
         if len(options) <= 1:
             await ctx.send('Give atleast two options to start a a poll')
             return
