@@ -120,7 +120,7 @@ class FunBot(commands.Cog):
     @commands.command(name="text_ascii")
     async def asciiArt(self, ctx, *text):
         text = " ".join(text) 
-        ascii_banner = pyfiglet.figlet_format("Hello!!")
+        ascii_banner = pyfiglet.figlet_format(text)
         embed=discord.Embed(description=f"```{ascii_banner}```")
         await ctx.send(embed=embed)
 
@@ -128,17 +128,24 @@ class FunBot(commands.Cog):
     @commands.command(name="team")
     async def team(self, ctx, num=2):
 
-        embed=discord.Embed(title="Team split", description="**No of teams : ** `2`\n\n**React** to this msg to be included in the pool\n\n\n")
+        embed=discord.Embed(title="Team split", description="f**No of teams : ** `{num}`\n\n**React** to this msg to be included in the pool\n\n\n")
         embed.set_footer(text="NOTE: Poll ends in 30 sec.")
         message = await ctx.send(embed=embed)
         await message.add_reaction('✅')
 
-        await asyncio.sleep(30)
+
+        embed = discord.Embed(description='Poll ends in 00:30 sec')
+        countdown_message = await ctx.send(embed=embed)
+        time_limit = 29
+        while time_limit >= 1:
+            await asyncio.sleep(1)
+            new_embed = discord.Embed(description=f"Poll ends in 00:{time_limit} sec")
+            await countdown_message.edit(embed=new_embed)
+            time_limit -= 1
 
         channel = self.bot.get_channel(message.channel.id)        
         poll_message = await channel.fetch_message(message.id)
 
-        await ctx.send(f"reactions: {poll_message.reactions}")
         user_names = []
         for reaction in poll_message.reactions:
             users = await reaction.users().flatten()
@@ -147,17 +154,13 @@ class FunBot(commands.Cog):
         user_names = list(set(user_names))
 
         await poll_message.delete()
-        embed = discord.Embed(description="Time Over!!\nGenerating teams...")
-        await ctx.send(embed=embed)
-        await asyncio.sleep(1)
-        await ctx.message.channel.purge(limit=1)
-
+        await countdown_message.delete()
         user_names.remove('InnerveVibe #0999')
 
         if len(user_names) <= 2:
-            embed = discord.Embed(description="Poll did not have any reaction.\nEnding poll")
+            embed = discord.Embed(description="Poll should have atleast 3 reaction to create team.\n'Ending poll'")
             await ctx.send(embed=embed)
-            return 
+            return
         random.shuffle(user_names)
         user_names = self.team_split(user_names, num)
         text = ''
@@ -170,7 +173,7 @@ class FunBot(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name='poll')
-    async def pollGenerate(self, ctx, question, *options):
+    async def poll_generate(self, ctx, *options):
         options = list(options)
         if options[0].count("'") == 0:
             await ctx.send("Pls give the question in quotes")
@@ -187,6 +190,7 @@ class FunBot(commands.Cog):
                 question += " "+options[0]
                 options.pop(0)
         question = question.capitalize()
+        print ('\n', options, '================', question, '\n')
         if len(options) <= 1:
             await ctx.send('Give atleast two options to start a a poll')
             return
@@ -209,4 +213,4 @@ class FunBot(commands.Cog):
         for reaction in reactions[:len(options)]:
             await react_message.add_reaction(reaction)
         await react_message.edit(embed=embed)
-        
+
