@@ -38,6 +38,8 @@ Entertainment
    └─ Displays an ascii art of the said text.
    %poll ['question'] [poll options]
    └─ Sends a random movie name and details to the tagged user.
+   %team [no of teams]
+   └─ Splits the users who react to a msg into specified no of teams
 ```
 
 ```
