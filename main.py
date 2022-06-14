@@ -27,10 +27,10 @@ async def clear(ctx, amount=5):
     # Purges last 5 messages in the channel
     await ctx.channel.purge(limit=amount)
 
-# HELP COMMAND    
+
 @bot.group(invoke_without_command=True)
 async def helpcmd(ctx):
-    em = discord.Embed(title="Help", description="Use %help <command> for more info on that command")
+    em = discord.Embed(title="Help", description="Use %helpcmd <command> for more info on that command")
     em.add_field(name="Music", value="`play`, `pause`, `resume`, `skip`, `queue`, `leave`, `lyrics`",  inline=False)
     em.add_field(name="Fun", value="`roll_die`, `coin_toss`, `wiki`, `m8ball`, `dumb_charades`, `text_ascii`, `team`, `poll`",  inline=False)
     em.add_field(name="Utility", value="`helpcmd`, `clear`",  inline=False)
@@ -87,7 +87,7 @@ async def roll_die(ctx):
 @helpcmd.command()
 async def toss_coin(ctx):
     em = discord.Embed(title="Toss Coin", description="Chooses heads or tails")
-    em.add_field(name="**Syntax**", value="`%toss_coin`")
+    em.add_field(name="**Syntax**", value="`%coin_toss`")
     await ctx.send(embed=em)
 
 @helpcmd.command()
@@ -123,7 +123,7 @@ async def team(ctx):
 @helpcmd.command()
 async def poll(ctx):
     em = discord.Embed(title="Poll", description="Displays a poll message in the server")
-    em.add_field(name="**Syntax**", value="`%poll <question> <options, min=2, max=6>`")
+    em.add_field(name="**Syntax**", value="`%poll '<question>' <option1>, <option2>, <min=2, max=6>`")
     await ctx.send(embed=em)
 
 @helpcmd.command()
