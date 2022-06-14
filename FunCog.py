@@ -37,27 +37,26 @@ class FunBot(commands.Cog):
 
 
     def movie(self):
-        url = 'http://www.imdb.com/chart/top'
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'lxml')
-
-        movies = soup.select('td.titleColumn')
-        cast = [a.attrs.get('title') for a in soup.select('td.titleColumn a')]
         movie_list = []
 
-        for index in range(0, len(movies)):
-            movie_string = movies[index].get_text()
-            movie = (' '.join(movie_string.split()).replace('.', ''))
-            movie_title = movie[len(str(index))+1:-7]
-            year = re.search('\((.*?)\)', movie_string).group(1)
-            data = {"movie_title": movie_title,
-                    "year": year,
-                    "star_cast": cast[index]}
-            movie_list.append(data)
+        url_list = ['http://www.imdb.com/chart/top', 'https://www.imdb.com/chart/moviemeter/?ref_=nv_mv_mpm']
+        for url in url_list:
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, 'lxml')
+            movies = soup.select('td.titleColumn')
+            for index in range(0, len(movies)):
+                year = movies[index].find('span').text
+                cast = movies[index].find('a').attrs.get('title')
+                title = movies[index].find('a').text
+                data = {"movie_title": title,
+                        "year": year,
+                        "star_cast": cast}
+                movie_list.append(data)
 
-        movie_index = random.randint(0, 249)
-        return movie_list[movie_index]
+        movie_name = random.choice(movie_list)
+        return movie_name
 
+    
     def team_split(self, members, num):
         no_of_members = len(members)
         teams = []
@@ -88,6 +87,7 @@ class FunBot(commands.Cog):
         data = self.random_wiki()
         embed=discord.Embed(title=data['title'], url=data['url'], description=data['summary'])
         await ctx.send(embed=embed)
+
 
     @commands.command(name="m8ball")
     async def eightBall(self, ctx, question = ""):
@@ -158,7 +158,7 @@ class FunBot(commands.Cog):
         user_names.remove('InnerveVibe #0999')
 
         if len(user_names) <= 2:
-            embed = discord.Embed(description="Poll should have atleast 3 reaction to create team.\n'Ending poll'")
+            embed = discord.Embed(description="Poll should have atleast 3 reaction to create team.\n'Ending poll...'")
             await ctx.send(embed=embed)
             return
         random.shuffle(user_names)
@@ -176,7 +176,7 @@ class FunBot(commands.Cog):
     async def poll_generate(self, ctx, *options):
         options = list(options)
         if options[0].count("'") == 0:
-            await ctx.send("Pls give the question in quotes")
+            await ctx.send("Pls give the question in single quotes")
             return
 
         options[0] = options[0][1:]
@@ -190,7 +190,7 @@ class FunBot(commands.Cog):
                 question += " "+options[0]
                 options.pop(0)
         question = question.capitalize()
-        print ('\n', options, '================', question, '\n')
+        options = ' '.join(options).split(', ')
         if len(options) <= 1:
             await ctx.send('Give atleast two options to start a a poll')
             return
