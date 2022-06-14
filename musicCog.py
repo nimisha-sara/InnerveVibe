@@ -2,11 +2,12 @@ import discord
 from discord.ext import commands
 
 import youtube_dl
+from lyrics_extractor import SongLyrics
 
 import urllib.request
 import json
-
 import os
+
 import dotenv
 dotenv.load_dotenv()
 
@@ -22,7 +23,6 @@ class MusicBot(commands.Cog):
         self.voice = ''
 
     def song_lyrics(self, song):
-        from lyrics_extractor import SongLyrics
         extract_lyrics = SongLyrics(os.getenv('GCS_API_KEY'), os.getenv('GCS_ENGINE_ID'))
         try:
             data = extract_lyrics.get_lyrics(song)
@@ -39,7 +39,10 @@ class MusicBot(commands.Cog):
                 info = ydl.extract_info("ytsearch:%s" % song, download=False)['entries'][0]
             except Exception: 
                 return False
-        
+
+        if info['duration'] > 480:
+            return "error!"
+
         search = info['title'].replace('-', '')
         search = search.replace('|', '')
         search = search.replace('@', '')
@@ -89,7 +92,8 @@ class MusicBot(commands.Cog):
 
     @commands.command(name="play")
     async def play(self, ctx, *song_str):
-        song_name = " ".join(song_str)      
+        song_name = " ".join(song_str) 
+        song_name += ' song'     
        
         voice_channel = ctx.author.voice.channel
 
@@ -97,14 +101,17 @@ class MusicBot(commands.Cog):
             await ctx.send("Connect to a voice channel!")
         else:
             song = self.search_song(song_name)
-            self.songs_queue.append([song, voice_channel])
+            if song == 'error!':
+                await ctx.send("Song not found!")
+            else:
+                self.songs_queue.append([song, voice_channel])
 
-            embed=discord.Embed(title=f"\n{self.songs_queue[-1][0]['song-title']}", url=self.songs_queue[-1][0]['video_url'], description='**Added to queue**')
-            embed.set_thumbnail(url=self.songs_queue[0][0]['image_url'])
-            await ctx.send(embed=embed)
+                embed=discord.Embed(title=f"\n{self.songs_queue[-1][0]['song-title']}", url=self.songs_queue[-1][0]['video_url'], description='**Added to queue**')
+                embed.set_thumbnail(url=self.songs_queue[0][0]['image_url'])
+                await ctx.send(embed=embed)
 
-            if self.is_playing == False:
-                await self.play_music()
+                if self.is_playing == False:
+                    await self.play_music()
 
 
     @commands.command(name="queue")
